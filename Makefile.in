@@ -17,6 +17,7 @@ CXXFLAGS=@CXXFLAGS@
 EXEEXT=@EXEEXT@
 LDFLAGS=@LDFLAGS@
 LIBOBJDIR=lib/
+SIMD=@SIMD@
 
 INSTALLCMD=@INSTALL@
 INSTALLMAN=@INSTALL@
@@ -31,6 +32,11 @@ VERSION=@RSYNC_VERSION@
 .SUFFIXES:
 .SUFFIXES: .c .o
 
+CXXOBJ=
+ifeq ($(SIMD),x86-64)
+    CXXOBJ=checksum_simd_x86_64.o
+endif
+
 GENFILES=configure.sh aclocal.m4 config.h.in proto.h proto.h-tstamp rsync.1 rsync-ssl.1 rsyncd.conf.5
 HEADERS=byteorder.h config.h errcode.h proto.h rsync.h ifuncs.h itypes.h inums.h \
 	lib/pool_alloc.h
@@ -43,7 +49,6 @@ OBJS1=flist.o rsync.o generator.o receiver.o cleanup.o sender.o exclude.o \
 OBJS2=options.o io.o compat.o hlink.o token.o uidlist.o socket.o hashtable.o \
 	fileio.o batch.o clientname.o chmod.o acls.o xattrs.o
 OBJS3=progress.o pipe.o
-CXXOBJ=@CXXOBJ@
 DAEMON_OBJ = params.o loadparm.o clientserver.o access.o connection.o authenticate.o
 popt_OBJS=popt/findme.o  popt/popt.o  popt/poptconfig.o \
 	popt/popthelp.o popt/poptparse.o
@@ -118,7 +123,7 @@ rounding.h: rounding.c rsync.h proto.h
 	fi
 	@rm -f rounding.out
 
-checksum_sse2.o: checksum_sse2.cpp
+checksum_simd_x86_64.o: checksum_simd_x86_64.cpp
 	$(CXX) $(CXXFLAGS) $(CPPFLAGS) -c -o $@ $<
 
 tls$(EXEEXT): $(TLS_OBJ)

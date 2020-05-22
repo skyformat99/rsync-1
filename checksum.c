@@ -99,7 +99,7 @@ int canonical_checksum(int csum_type)
 	return csum_type >= CSUM_MD4 ? 1 : 0;
 }
 
-#ifndef ENABLE_SSE2 /* See checksum_sse2.cpp for the SSE2 version. */
+#ifndef HAVE_SIMD // see checksum_simd_*.cpp
 /*
   a simple 32 bit checksum that can be updated from either end
   (inspired by Mark Adler's Adler-32 checksum)
